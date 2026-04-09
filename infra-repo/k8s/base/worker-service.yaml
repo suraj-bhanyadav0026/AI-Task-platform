@@ -1,0 +1,10 @@
+# === FILE: infra-repo/k8s/base/worker-service.yaml ===
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker
+  namespace: ai-tasks
+spec:
+  clusterIP: None # Headless service, workers don't accept incoming traffic
+  selector:
+    app: worker

@@ -1,0 +1,34 @@
+#! frontend-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: frontend
+    namespace: ai-task-platform
+    labels:
+        com.docker.compose.project: ai-task-platform
+        com.docker.compose.service: frontend
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: ai-task-platform
+            com.docker.compose.service: frontend
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: ai-task-platform
+                com.docker.compose.service: frontend
+                com.docker.compose.network.ai-task-net: "true"
+        spec:
+            containers:
+                - name: frontend
+                  image: ai-task-platform-frontend
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                    - name: frontend-80
+                      containerPort: 80
+                    - name: frontend-8080
+                      containerPort: 8080

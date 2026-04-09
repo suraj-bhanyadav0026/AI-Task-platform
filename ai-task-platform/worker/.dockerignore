@@ -1,0 +1,6 @@
+# === FILE: worker/.dockerignore ===
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/

@@ -1,0 +1,102 @@
+# === FILE: docker-compose.yml ===
+
+services:
+  frontend:
+    build: 
+      context: ./frontend
+      target: production
+    ports:
+      - "3000:8080" # Nginx serves on 8080 inside container
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - ai-task-net
+
+  backend:
+    build:
+      context: ./backend
+      target: production
+    ports:
+      - "5001:5000"
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - MONGODB_URI=mongodb://root:mongopassword@mongo:27017/ai_tasks?authSource=admin
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=supersecretjwtkey_local_dev_only_change_in_prod
+      - FRONTEND_URL=http://localhost:3000
+      - LOG_LEVEL=debug
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - ai-task-net
+
+  worker:
+    build:
+      context: ./worker
+    environment:
+      - MONGODB_URI=mongodb://root:mongopassword@mongo:27017/ai_tasks?authSource=admin
+      - REDIS_URL=redis://redis:6379
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"] # Simplified healthcheck for python
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      replicas: 1 # In dev, one worker is fine. Staging/Prod K8s will use HPA
+    networks:
+      - ai-task-net
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=mongopassword
+      - MONGO_INITDB_DATABASE=ai_tasks
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ai-task-net
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ai-task-net
+
+networks:
+  ai-task-net:
+    driver: bridge
+
+volumes:
+  mongo-data:

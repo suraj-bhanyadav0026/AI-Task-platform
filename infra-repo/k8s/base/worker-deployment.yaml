@@ -1,0 +1,45 @@
+# === FILE: infra-repo/k8s/base/worker-deployment.yaml ===
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: ai-tasks
+spec:
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+        - name: worker
+          image: yourdockerhub/ai-task-worker:latest
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: app-config
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          livenessProbe:
+            exec:
+              command:
+              - python
+              - -c
+              - "import sys; sys.exit(0)"
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            exec:
+              command:
+              - python
+              - -c
+              - "import sys; sys.exit(0)"
+            initialDelaySeconds: 15
+            periodSeconds: 10

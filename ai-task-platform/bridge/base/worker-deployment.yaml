@@ -1,0 +1,42 @@
+#! worker-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: worker
+    namespace: ai-task-platform
+    labels:
+        com.docker.compose.project: ai-task-platform
+        com.docker.compose.service: worker
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: ai-task-platform
+            com.docker.compose.service: worker
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: ai-task-platform
+                com.docker.compose.service: worker
+                com.docker.compose.network.ai-task-net: "true"
+        spec:
+            containers:
+                - name: worker
+                  image: ai-task-platform-worker
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: MONGODB_URI
+                      value: "mongodb://root:mongopassword@mongo:27017/ai_tasks?authSource=admin"
+                    - name: PYTHONUNBUFFERED
+                      value: "1"
+                    - name: REDIS_URL
+                      value: "redis://redis:6379"
+                  livenessProbe:
+                    exec:
+                        command: [python -c import sys; sys.exit(0)]
+                    periodSeconds: 10
+                    timeoutSeconds: 5
+                    failureThreshold: 3

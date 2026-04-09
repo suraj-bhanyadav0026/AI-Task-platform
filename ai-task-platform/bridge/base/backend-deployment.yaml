@@ -1,0 +1,54 @@
+#! backend-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: backend
+    namespace: ai-task-platform
+    labels:
+        com.docker.compose.project: ai-task-platform
+        com.docker.compose.service: backend
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: ai-task-platform
+            com.docker.compose.service: backend
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: ai-task-platform
+                com.docker.compose.service: backend
+                com.docker.compose.network.ai-task-net: "true"
+        spec:
+            containers:
+                - name: backend
+                  image: ai-task-platform-backend
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: FRONTEND_URL
+                      value: "http://localhost:3000"
+                    - name: JWT_SECRET
+                      value: "supersecretjwtkey_local_dev_only_change_in_prod"
+                    - name: LOG_LEVEL
+                      value: "debug"
+                    - name: MONGODB_URI
+                      value: "mongodb://root:mongopassword@mongo:27017/ai_tasks?authSource=admin"
+                    - name: NODE_ENV
+                      value: "development"
+                    - name: PORT
+                      value: "5000"
+                    - name: REDIS_URL
+                      value: "redis://redis:6379"
+                  livenessProbe:
+                    exec:
+                        command: ['wget --no-verbose --tries=1 --spider http://localhost:5000/api/v1/health']
+                    periodSeconds: 10
+                    initialDelaySeconds: 10
+                    timeoutSeconds: 5
+                    failureThreshold: 5
+                  ports:
+                    - name: backend-5000
+                      containerPort: 5000

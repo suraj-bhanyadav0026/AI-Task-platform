@@ -1,0 +1,13 @@
+# === FILE: infra-repo/k8s/base/configmap.yaml ===
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: ai-tasks
+data:
+  NODE_ENV: "production"
+  PORT: "5000"
+  MONGODB_URI: "mongodb://root:mongopassword@mongo-0.mongo.ai-tasks.svc.cluster.local:27017/ai_tasks?authSource=admin"
+  REDIS_URL: "redis://redis:6379"
+  FRONTEND_URL: "https://tasks.yourdomain.com"
+  LOG_LEVEL: "info"

@@ -1,0 +1,8 @@
+#! 0-ai-task-platform-namespace.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: ai-task-platform
+    labels:
+        com.docker.compose.project: ai-task-platform

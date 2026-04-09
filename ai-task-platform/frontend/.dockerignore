@@ -1,0 +1,7 @@
+# === FILE: frontend/.dockerignore ===
+node_modules
+dist
+.env
+.env.local
+.DS_Store
+Dockerfile

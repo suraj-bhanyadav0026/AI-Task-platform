@@ -1,0 +1,12 @@
+# === FILE: infra-repo/k8s/base/mongo-pvc.yaml ===
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc-standalone
+  namespace: ai-tasks
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi

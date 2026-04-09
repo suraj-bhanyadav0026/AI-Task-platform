@@ -1,0 +1,13 @@
+# === FILE: infra-repo/k8s/base/frontend-service.yaml ===
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: ai-tasks
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
