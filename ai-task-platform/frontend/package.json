@@ -2,7 +2,7 @@
   "name": "ai-task-frontend",
   "private": true,
   "version": "1.0.0",
-  "homepage": "https://ai-task-platform-1svn.vercel.app",
+"homepage":"https://ai-task-platform-gold.vercel.app"
   "scripts": {
     "dev": "vite",
     "build": "vite build",
